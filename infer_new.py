@@ -1,16 +1,13 @@
 import argparse
-import time
+import hashlib
 import math
+import os
+import time
+
 import numpy as np
 import torch
-import torch.nn as nn
 
 import data
-import model
-import pruning_basic
-
-from state import State
-
 from utils import batchify, get_batch, repackage_hidden
 
 parser = argparse.ArgumentParser(description='PyTorch PennTreeBank RNN/LSTM Language Model')
@@ -53,7 +50,7 @@ parser.add_argument('--cuda', action='store_false',
 parser.add_argument('--log-interval', type=int, default=200, metavar='N',
                     help='report interval')
 randomhash = ''.join(str(time.time()).split('.'))
-parser.add_argument('--save', type=str,  default=randomhash+'.pt',
+parser.add_argument('--save', type=str, default=randomhash + '.pt',
                     help='path to save the final model')
 parser.add_argument('--alpha', type=float, default=2,
                     help='alpha L2 regularization on RNN activation (alpha = 0 means no regularization)')
@@ -61,66 +58,61 @@ parser.add_argument('--beta', type=float, default=1,
                     help='beta slowness regularization applied on RNN activiation (beta = 0 means no regularization)')
 parser.add_argument('--wdecay', type=float, default=1.2e-6,
                     help='weight decay applied to all weights')
-parser.add_argument('--resume', type=str,  default='',
+parser.add_argument('--resume', type=str, default='',
                     help='path of model to resume')
-parser.add_argument('--optimizer', type=str,  default='sgd',
+parser.add_argument('--optimizer', type=str, default='sgd',
                     help='optimizer to use (sgd, adam)')
 parser.add_argument('--when', nargs="+", type=int, default=[-1],
                     help='When (which epochs) to divide the learning rate by 10 - accepts multiple')
 args = parser.parse_args()
 args.tied = True
 
-from sklearn import cluster
-import scipy.cluster.vq as vq
-from kmeans_scaler_hist import kmeans_scaler_hist
-import numpy as np
-from state import State
 
 def model_load(fn):
     global model, criterion, optimizer
     with open(fn, 'rb') as f:
         model, criterion, optimizer = torch.load(f)
 
+
 def evaluate(data_source, batch_size=20):
     # Turn on evaluation mode which disables dropout.
 
     state_dict = model.state_dict()
     for k, i in state_dict.items():
-        
-       '''print(k)
-       print(i.shape)'''
-       sz = i.shape
-       t = i.cpu().numpy()
-       max_coeff_abs = np.amax(np.absolute(t))
 
-       # print(i.data.numpy())
-    
-       b = t
-    
-       if (len(sz) > 1):
-          pass
-          'divide to four submatrices'
-          print(i.size())
-          print(np.count_nonzero(b)/b.size)
-    
+        '''print(k)
+        print(i.shape)'''
+        sz = i.shape
+        t = i.cpu().numpy()
+        max_coeff_abs = np.amax(np.absolute(t))
+
+        # print(i.data.numpy())
+
+        b = t
+
+        if (len(sz) > 1):
+            pass
+            'divide to four submatrices'
+            print(i.size())
+            print(np.count_nonzero(b) / b.size)
+
     model.cuda()
     model.eval()
     if args.model == 'QRNN': model.reset()
     total_loss = 0
     ntokens = len(corpus.dictionary)
     hidden = model.init_hidden(batch_size)
-    
-    
+
     for i in range(0, data_source.size(0) - 1, args.bptt):
         data, targets = get_batch(data_source, i, args, evaluation=True)
         data = data.cuda()
         output, hidden = model(data, hidden)
-        total_loss += len(data) * criterion(model.decoder.weight.cpu(), model.decoder.bias.cpu(), output.cpu(), targets.cpu()).data
+        total_loss += len(data) * criterion(model.decoder.weight.cpu(), model.decoder.bias.cpu(), output.cpu(),
+                                            targets.cpu()).data
         hidden = repackage_hidden(hidden)
     return total_loss.item() / len(data_source)
 
-import os
-import hashlib
+
 fn = 'corpus.{}.data'.format(hashlib.md5(args.data.encode()).hexdigest())
 if os.path.exists(fn):
     print('Loading cached dataset...')
@@ -140,7 +132,7 @@ test_data = batchify(corpus.test, test_batch_size, args)
 model_load("PTB_att.pt")
 
 state_dict = model.state_dict()
-      
+
 print(model)
 
 # Run on test data.
@@ -149,4 +141,3 @@ print('=' * 89)
 print('| End of training | test loss {:5.2f} | test ppl {:8.2f} | test bpc {:8.3f}'.format(
     test_loss, math.exp(test_loss), test_loss / math.log(2)))
 print('=' * 89)
-
