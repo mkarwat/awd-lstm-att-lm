@@ -30,9 +30,9 @@ For WikiText-2 run:
 python infer_new.py --data data/wikitext-2 --load WT2_att.pt
 ```
 ### Results
-|       |                           | test ppl | valid ppl |
-|-------|---------------------------|----------|-----------|
-| PTB   | awd-lstm-att-lm           | 45.22    | 46.50     |
-|       | awd-lstm-att-lm + pruning |          |           |
-| WIKI2 | awd-lstm-att-lm           | 39.12    | 40.75     |
-|       | awd-lstm-att-lm + pruning |          |           |
+|      |                           | Number of params | test ppl | valid ppl |
+|------|---------------------------|------------------|----------|-----------|
+| PTB  | awd-lstm-att-lm           | 27M              | 45.22    | 46.50     |
+|      | awd-lstm-att-lm + pruning | 19M              | 45.98    |           |
+| WT-2 | awd-lstm-att-lm           | 40M              | 39.12    | 40.75     |
+|      | awd-lstm-att-lm + pruning | 27M              | 38.44    |           |
