@@ -13,6 +13,8 @@ from utils import batchify, get_batch, repackage_hidden
 parser = argparse.ArgumentParser(description='PyTorch PennTreeBank RNN/LSTM Language Model')
 parser.add_argument('--data', type=str, default='data/penn/',
                     help='location of the data corpus')
+parser.add_argument('--load', type=str, default='PTB_att.pt',
+                    help='trained model for inference')
 parser.add_argument('--model', type=str, default='LSTM',
                     help='type of recurrent net (LSTM, QRNN, GRU)')
 parser.add_argument('--emsize', type=int, default=400,
@@ -129,7 +131,7 @@ val_data = batchify(corpus.valid, eval_batch_size, args)
 test_data = batchify(corpus.test, test_batch_size, args)
 
 # Load the best saved model.
-model_load("PTB_att.pt")
+model_load(args.load)
 
 state_dict = model.state_dict()
 
@@ -140,4 +142,10 @@ test_loss = evaluate(test_data, test_batch_size)
 print('=' * 89)
 print('| End of training | test loss {:5.2f} | test ppl {:8.2f} | test bpc {:8.3f}'.format(
     test_loss, math.exp(test_loss), test_loss / math.log(2)))
+print('=' * 89)
+# Run on test data.
+val_loss = evaluate(val_data, test_batch_size)
+print('=' * 89)
+print('| End of training | val loss {:5.2f} | val ppl {:8.2f} | val bpc {:8.3f}'.format(
+    val_loss, math.exp(val_loss), val_loss / math.log(2)))
 print('=' * 89)
