@@ -133,7 +133,21 @@ test_data = batchify(corpus.test, test_batch_size, args)
 # Load the best saved model.
 model_load(args.load)
 
+
+def count_zeros(model_state_dict):
+    total_params = 0
+    total_zeros = 0
+    for layer, params in model_state_dict.items():
+        total = params.numel()
+        zeros = (params == 0).sum()
+        print(f'{layer}: {total} params, {zeros} zeros ({100 * zeros / total}%)')
+        total_params += total
+        total_zeros += zeros
+    print(f'total: {total_params} params, {total_zeros} zeros ({100 * total_zeros / total_params}%)')
+
+
 state_dict = model.state_dict()
+count_zeros(model.state_dict())
 
 print(model)
 
