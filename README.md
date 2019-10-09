@@ -16,7 +16,7 @@ Download trained models:
 
 [PTB_att_pruned.pt](https://box.cyfronet.pl/s/rcTjb2WXk5PobiC)
 
-[WT2_att.pt](https://box.cyfronet.pl/s/2GXey8KdJYNz8yn)
+[WT2_att.pt](https://box.cyfronet.pl/s/TxarCDf9wyq3qnn)
 
 [WT2_att_pruned.pt](https://box.cyfronet.pl/s/mycmxzsAArjHR88)
 ### Data
@@ -46,5 +46,5 @@ python infer_new.py --data data/wikitext-2 --load WT2_att_pruned.pt
 |------|---------------------------|------------------|----------|-----------|
 | PTB  | awd-lstm-att-lm           | 28.7M            | 45.22    | 46.50     |
 |      | awd-lstm-att-lm + pruning | 18.5M            | 45.94    | 47.29     |
-| WT-2 | awd-lstm-att-lm           | 47.3M            | 39.12    | 40.75     |
+| WT-2 | awd-lstm-att-lm           | 47.1M            | 35.27    | 36.97     |
 |      | awd-lstm-att-lm + pruning | 31.9M            | 38.31    | 40.07     |
